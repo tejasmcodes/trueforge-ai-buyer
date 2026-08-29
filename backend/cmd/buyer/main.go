@@ -2,8 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"net/http"
 	"log"
+	"net/http"
+	"time"
 )
 
 type Message struct {
@@ -13,7 +14,7 @@ type Message struct {
 func main() {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request){
+	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("TrueForge Agent Harness Project"))
 	})
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
@@ -26,9 +27,19 @@ func main() {
 		json.NewEncoder(w).Encode(message)
 	})
 
-	err := http.ListenAndServe(":8080", mux)
+	server := &http.Server{
+		Addr:              ":8080",
+		Handler:           mux,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       60 * time.Second,
+	}
+
+	err := server.ListenAndServe()
+
 	if err != nil {
-		log.Fatal("Failed to start the server!")
+		log.Fatalf("failed to start the server: %v", err)
 	}
 
 }
