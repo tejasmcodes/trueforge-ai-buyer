@@ -2,6 +2,7 @@ package mcpserver
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
@@ -12,16 +13,24 @@ type SearchProductsInput struct {
 	Category string   `json:"category,omitempty" jsonschema:"product category"`
 }
 
+type SearchProductsOutput struct {
+	Products []Product `json:"products"`
+}
+
+type GetProductInput struct {
+	ProductID string `json:"product_id" jsonschema:"the ID of the product to retrieve"`
+}
+
+type GetProductOutput struct {
+	Product Product `json:"product"`
+}
+
 type Product struct {
 	ID       string  `json:"id"`
 	Name     string  `json:"name"`
 	Category string  `json:"category"`
 	Price    float64 `json:"price"`
 	Currency string  `json:"currency"`
-}
-
-type SearchProductsOutput struct {
-	Products []Product `json:"products"`
 }
 
 func searchProducts(
@@ -32,6 +41,20 @@ func searchProducts(
 
 	return nil, SearchProductsOutput{
 		Products: filterProducts(input),
+	}, nil
+}
+
+func getProductByID(
+	ctx context.Context,
+	req *mcp.CallToolRequest,
+	input GetProductInput,
+) (*mcp.CallToolResult, GetProductOutput, error) {
+	product, found := getProduct(input.ProductID)
+	if !found {
+		return nil, GetProductOutput{}, fmt.Errorf("product %q not found", input.ProductID)
+	}
+	return nil, GetProductOutput{
+		Product: product,
 	}, nil
 }
 
@@ -51,6 +74,15 @@ func NewServer() *mcp.Server {
 			Description: "Search the buyer's product catalog for products matching the user's requirements.",
 		},
 		searchProducts,
+	)
+
+	mcp.AddTool(
+		server,
+		&mcp.Tool{
+			Name:        "get_product",
+			Description: "Retrieve a product from the buyer's catalog by its product ID.",
+		},
+		getProductByID,
 	)
 
 	return server
