@@ -7,9 +7,9 @@ import (
 )
 
 type SearchProductsInput struct {
-	Query    string  `json:"query" jsonschema:"the product the user is looking for"`
-	MaxPrice float64 `json:"max_price,omitempty" jsonschema:"maximum acceptable price"`
-	Category string  `json:"category,omitempty" jsonschema:"product category"`
+	Query    string   `json:"query" jsonschema:"the product the user is looking for"`
+	MaxPrice *float64 `json:"max_price,omitempty" jsonschema:"maximum acceptable price"`
+	Category string   `json:"category,omitempty" jsonschema:"product category"`
 }
 
 type Product struct {

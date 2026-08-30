@@ -1,6 +1,8 @@
 package mcpserver
 
-import "strings"
+import (
+	"strings"
+)
 
 var products = []Product{
 	{
@@ -45,7 +47,8 @@ func filterProducts(input SearchProductsInput) []Product {
 			continue
 		}
 
-		if input.MaxPrice > 0 && product.Price > input.MaxPrice {
+		if input.MaxPrice != nil &&
+			product.Price > *input.MaxPrice {
 			continue
 		}
 

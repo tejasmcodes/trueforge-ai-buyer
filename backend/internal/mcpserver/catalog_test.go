@@ -2,6 +2,10 @@ package mcpserver
 
 import "testing"
 
+func float64Ptr(value float64) *float64 {
+	return &value
+}
+
 func TestFilterProducts(t *testing.T) {
 	tests := []struct {
 		name      string
@@ -18,7 +22,7 @@ func TestFilterProducts(t *testing.T) {
 		{
 			name: "max price filters products",
 			input: SearchProductsInput{
-				MaxPrice: 5000,
+				MaxPrice: float64Ptr(5000),
 			},
 			wantCount: 2,
 		},
@@ -33,7 +37,7 @@ func TestFilterProducts(t *testing.T) {
 			name: "combined filters",
 			input: SearchProductsInput{
 				Query:    "swift",
-				MaxPrice: 5000,
+				MaxPrice: float64Ptr(5000),
 				Category: "running",
 			},
 			wantCount: 1,
@@ -46,8 +50,8 @@ func TestFilterProducts(t *testing.T) {
 			wantCount: 0,
 		},
 		{
-			name: "empty input returns all products",
-			input: SearchProductsInput{},
+			name:      "empty input returns all products",
+			input:     SearchProductsInput{},
 			wantCount: 3,
 		},
 		{
@@ -74,14 +78,21 @@ func TestFilterProducts(t *testing.T) {
 		{
 			name: "price equal to max price is included",
 			input: SearchProductsInput{
-				MaxPrice: 3499,
+				MaxPrice: float64Ptr(3499),
 			},
 			wantCount: 1,
 		},
 		{
 			name: "price above max price is excluded",
 			input: SearchProductsInput{
-				MaxPrice: 3498,
+				MaxPrice: float64Ptr(3498),
+			},
+			wantCount: 0,
+		},
+		{
+			name: "zero max price returns no products",
+			input: SearchProductsInput{
+				MaxPrice: float64Ptr(0),
 			},
 			wantCount: 0,
 		},
