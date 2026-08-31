@@ -64,3 +64,69 @@ func TestSearchProducts(t *testing.T) {
 		})
 	}
 }
+
+
+func TestGetProductByID(t *testing.T){
+	tests := []struct {
+		name	string
+		input   GetProductInput
+		expectedProduct Product
+		expectedError string
+	}{
+		{
+			name: "product exists",
+			input: GetProductInput{
+			ProductID: "shoe-001",
+			},
+			expectedProduct: Product{
+					ID:       "shoe-001",
+					Name:     "SwiftRun Pro",
+					Category: "running",
+					Price:    3499,
+					Currency: "INR",
+			},
+			expectedError: "",
+		},
+		{
+			name:"product doesn't exist",
+			input: GetProductInput{
+				ProductID: "shoe-111",
+			},
+			expectedProduct: Product{},
+			expectedError: `product "shoe-111" not found`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T){
+			result, productOutput, err := getProductByID(context.Background(),nil, tt.input)
+			if result != nil {
+				t.Fatalf("expected nil as the result, but got: %v", result)
+			}
+
+			if tt.expectedError == "" {
+				if err != nil {
+					t.Fatalf("expected no error, but got: %v", err)
+				}
+			} else {
+				if err == nil {
+					t.Fatalf("expected error %q, but got nil", tt.expectedError)
+				}
+
+				if err.Error() != tt.expectedError {
+					t.Fatalf(
+						"expected error %q, but got %q",
+						tt.expectedError,
+						err.Error(),
+					)
+				}
+			}
+			if productOutput.Product != tt.expectedProduct{
+				t.Fatalf("expected product: %+v, but got: %+v",
+						tt.expectedProduct,
+						productOutput.Product,
+						)
+			}
+		})
+	}
+}
