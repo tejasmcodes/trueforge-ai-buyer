@@ -33,6 +33,19 @@ type Product struct {
 	Currency string  `json:"currency"`
 }
 
+type Inventory struct {
+	ProductID	string `json:"product_id"`
+	Quantity	int 	`json:"quantity"`
+}
+
+type CheckInventoryInput struct {
+	ProductID	string	`json:"product_id" jsonschema:"availability of the product in inventory"`
+}
+
+type CheckInventoryOutput struct {
+	Quantity		int		`json:"quantity"`
+}
+
 func searchProducts(
 	ctx context.Context,
 	req *mcp.CallToolRequest,
