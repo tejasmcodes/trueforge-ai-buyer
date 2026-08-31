@@ -4,9 +4,9 @@ import "testing"
 
 func TestGetInventory(t *testing.T) {
 	tests := []struct {
-		name            string
-		input           string
-		expectedFound   bool
+		name              string
+		input             string
+		expectedFound     bool
 		expectedInventory Inventory
 	}{
 		{
@@ -15,7 +15,7 @@ func TestGetInventory(t *testing.T) {
 			expectedFound: true,
 			expectedInventory: Inventory{
 				ProductID: "shoe-001",
-				Quantity: 5,
+				Quantity:  5,
 			},
 		},
 		{
@@ -24,7 +24,7 @@ func TestGetInventory(t *testing.T) {
 			expectedFound: true,
 			expectedInventory: Inventory{
 				ProductID: "shoe-004",
-				Quantity: 0,
+				Quantity:  0,
 			},
 		},
 		{
@@ -36,20 +36,20 @@ func TestGetInventory(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T){
+		t.Run(tt.name, func(t *testing.T) {
 			productID := tt.input
-			product, availability := getInventory(productID)
-			if product != tt.expectedInventory{
+			inventory, found := getInventory(productID)
+			if inventory != tt.expectedInventory {
 				t.Fatalf("expected %+v, but got %+v",
-						tt.expectedInventory,
-						product,
-						)
+					tt.expectedInventory,
+					inventory,
+				)
 			}
-			if availability != tt.expectedFound {
+			if found != tt.expectedFound {
 				t.Fatalf("expected %v, but got %v",
-						tt.expectedFound,
-						availability,
-						)
+					tt.expectedFound,
+					found,
+				)
 			}
 		})
 	}
