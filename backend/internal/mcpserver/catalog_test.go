@@ -1,3 +1,4 @@
+// ```go
 package mcpserver
 
 import "testing"
@@ -24,14 +25,14 @@ func TestFilterProducts(t *testing.T) {
 			input: SearchProductsInput{
 				MaxPrice: float64Ptr(5000),
 			},
-			wantCount: 2,
+			wantCount: 3,
 		},
 		{
 			name: "category filters products",
 			input: SearchProductsInput{
 				Category: "running",
 			},
-			wantCount: 3,
+			wantCount: 4,
 		},
 		{
 			name: "combined filters",
@@ -40,7 +41,7 @@ func TestFilterProducts(t *testing.T) {
 				MaxPrice: float64Ptr(5000),
 				Category: "running",
 			},
-			wantCount: 1,
+			wantCount: 2,
 		},
 		{
 			name: "no matches",
@@ -52,14 +53,14 @@ func TestFilterProducts(t *testing.T) {
 		{
 			name:      "empty input returns all products",
 			input:     SearchProductsInput{},
-			wantCount: 3,
+			wantCount: 4,
 		},
 		{
 			name: "query is case insensitive",
 			input: SearchProductsInput{
 				Query: "SWIFTRUN",
 			},
-			wantCount: 1,
+			wantCount: 2,
 		},
 		{
 			name: "query ignores surrounding whitespace",
@@ -73,7 +74,7 @@ func TestFilterProducts(t *testing.T) {
 			input: SearchProductsInput{
 				Category: "RUNNING",
 			},
-			wantCount: 3,
+			wantCount: 4,
 		},
 		{
 			name: "price equal to max price is included",
@@ -112,3 +113,60 @@ func TestFilterProducts(t *testing.T) {
 		})
 	}
 }
+
+func TestGetProduct(t *testing.T) {
+	tests := []struct {
+		name            string
+		input           string
+		expectedFound   bool
+		expectedProduct Product
+	}{
+		{
+			name:          "product exists",
+			input:         "shoe-001",
+			expectedFound: true,
+			expectedProduct: Product{
+				ID:       "shoe-001",
+				Name:     "SwiftRun Pro",
+				Category: "running",
+				Price:    3499,
+				Currency: "INR",
+			},
+		},
+		{
+			name:            "product doesn't exist",
+			input:           "shoe-111",
+			expectedFound:   false,
+			expectedProduct: Product{},
+		},
+		{
+			name:            "Empty input",
+			input:           "",
+			expectedFound:   false,
+			expectedProduct: Product{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			product, found := getProduct(tt.input)
+
+			if tt.expectedFound != found {
+				t.Fatalf(
+					"expected %v, but got %v",
+					tt.expectedFound,
+					found,
+				)
+			}
+
+			if found && product != tt.expectedProduct {
+				t.Fatalf(
+					"expected product %+v, but got %+v",
+					tt.expectedProduct,
+					product,
+				)
+			}
+		})
+	}
+}
+

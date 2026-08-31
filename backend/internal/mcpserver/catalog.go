@@ -26,6 +26,13 @@ var products = []Product{
 		Price:    5799,
 		Currency: "INR",
 	},
+	{
+		ID:       "shoe-004",
+		Name:     "SwiftRun ProMax",
+		Category: "running",
+		Price:    4499,
+		Currency: "INR",
+	},
 }
 
 func filterProducts(input SearchProductsInput) []Product {
@@ -57,4 +64,14 @@ func filterProducts(input SearchProductsInput) []Product {
 	}
 
 	return result
+}
+
+func getProduct(productID string) (Product, bool) {
+	for _, product := range products {
+		if product.ID == productID {
+			return product, true
+		}
+	}
+
+	return Product{}, false
 }
