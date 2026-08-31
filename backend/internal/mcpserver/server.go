@@ -33,6 +33,19 @@ type Product struct {
 	Currency string  `json:"currency"`
 }
 
+type Inventory struct {
+	ProductID string `json:"product_id"`
+	Quantity  int    `json:"quantity"`
+}
+
+type CheckInventoryInput struct {
+	ProductID string `json:"product_id" jsonschema:"availability of the product in inventory"`
+}
+
+type CheckInventoryOutput struct {
+	Quantity int `json:"quantity"`
+}
+
 func searchProducts(
 	ctx context.Context,
 	req *mcp.CallToolRequest,
@@ -56,6 +69,22 @@ func getProductByID(
 	return nil, GetProductOutput{
 		Product: product,
 	}, nil
+}
+
+func checkInventory(
+	ctx context.Context,
+	req *mcp.CallToolRequest,
+	input CheckInventoryInput,
+) (*mcp.CallToolResult, CheckInventoryOutput, error) {
+	inventory, found := getInventory(input.ProductID)
+
+	if !found {
+		return nil, CheckInventoryOutput{}, fmt.Errorf("product %q not found", input.ProductID)
+	}
+	return nil, CheckInventoryOutput{
+		Quantity: inventory.Quantity,
+	}, nil
+
 }
 
 func NewServer() *mcp.Server {
@@ -83,6 +112,15 @@ func NewServer() *mcp.Server {
 			Description: "Retrieve a product from the buyer's catalog by its product ID.",
 		},
 		getProductByID,
+	)
+
+	mcp.AddTool(
+		server,
+		&mcp.Tool{
+			Name:        "get_inventory",
+			Description: "Retrieve a product quantity from the inventory by its product ID.",
+		},
+		checkInventory,
 	)
 
 	return server
